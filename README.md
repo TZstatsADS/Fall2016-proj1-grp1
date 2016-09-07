@@ -1,5 +1,5 @@
 # Project: American Community Surveys (2013 and 2014)
-### [Project Description](project1_desc.md)
+### [Project Description](doc/project1_desc.md)
 
 Term: Fall 2016
 
