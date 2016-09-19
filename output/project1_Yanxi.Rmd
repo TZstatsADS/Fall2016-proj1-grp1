@@ -1,0 +1,80 @@
+Title: "occupation/income/commuteway"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning= F, message=F)
+```
+
+```{r}
+dat_pus <-readRDS("/Users/jesserina/Desktop/dat_pus.rds") ##load
+##data
+library(plyr)
+library(ggplot2)
+library(reshape)
+library(d3heatmap)
+jwtr.description<-read.table(text="
+01 .Car,truck,or van
+02 .Bus or trolley bus
+03 .Streetcar or trolley car(carro publico in Puerto Rico)
+04 .Subway or elevated
+05 .Railroad
+06 .Ferryboat
+07 .Taxicab
+08 .Motorcycle
+09 .Bicycle
+10 .Walked
+11 .Worked at home
+12 .Other method", head=F, sep=".") ##Map the JWTR code to the description, the occupation already mapped in the data
+dt<- ddply(dat_pus, .(JWTR,occupation), summarize, inc= median(PINCP, na.rm=T)) ##Summarize the data with the median income by the combinations of JWTR and occupation
+dt2<- with(dt, tapply(inc,list(occupation,JWTR),unique)) ##reshape the dt data frame into a table with row names occupation and column names JWTR
+dt2[9,c(3,4,6,7)]<-mean(dt2[9,],na.rm=T) ##replace missing values by the average income of this occupation EXT
+dt2[14,7]<-mean(dt2[14,],na.rm=T) ##replace missing values by the average inecome of the MIL
+dt3<-dt2[-nrow(dt2),] ##delete the whole row of missing values since it cannot be repaired
+colnames(dt3)<-jwtr.description[,2] ##replace JWTR code with JWTR actual description
+d3heatmap(dt3, scale="column",colors="RdYlBu",height=800, width=500) ##draw the D3 heatmap with color scheme RdYlBu and also set the height and width of the heatmap
+```
+
+
+
+From the above heatmap, we can easily find the prefrered occupation for each means of transportation to work. for example, for Taxicab, the deepest blue grid is LGL(LAWYERS, AND JUDGES, MAGISTRATES, AND OTHER JUDICIAL WORKERS), thus the LGL is the best occupation for people who use Taxicab to commute.
+
+
+
+
+```{r}
+library(treemap) ##load required packages
+library(dplyr)
+library(highcharter)
+library(viridisLite)
+dt4<-ddply(dat_pus, .(JWTR,occupation),summarize, income=median(PINCP, na.rm=T), time=median(JWMNP, na.rm=T))
+##add the median commute time for each combination of occupation and commute mean
+dt4$time[dt4$JWTR==11]<-0 #set travel time to 0 for people who work at home
+dt5<-na.omit(dt4) #remove missing values
+dt5$JWTR<-jwtr.description[,2][match(dt5$JWTR,jwtr.description[,1])] ##replace JWTR code with JWTR description
+tm<-treemap(dt5, index=c("JWTR","occupation"), vSize="income", vColor="time", type="value", palette=viridis(12)) ##draw a treemap, the map has been divided into 12 large grids. The 12 large grids represent the means of transportation. Each large grid contains some small grids which represent occupation;the size of each small grid is median income of that specific occupation, and the color represents the median travel time
+
+
+
+#The following code is to transform static treemap to dynamic highchart treemap
+hc_tm <- highchart() %>%
+hc_add_series_treemap(tm, allowDrillToNode=T,
+layoutAlgorithm="squarified",
+name="tmdata") %>%
+hc_title(text="Income Data") %>%
+hc_tooltip(pointFormat = "<b>{point.name}</b>:<br>
+median income: {point.value:,.0f}<br>
+travel time:{point.valuecolor:,.0f}")
+hc_tm
+
+```
+
+The above treemap has been divided into 12 large grids. The 12 large grids represent the means of transportation to work. Each large grid contains some small grids which represent occupation; the size of each small grid is median income of that specific occupation. The color represents the median travel time; the darker the color, the less median time is needed for transportation to work.
+
+
+
+
+
+
+
+
