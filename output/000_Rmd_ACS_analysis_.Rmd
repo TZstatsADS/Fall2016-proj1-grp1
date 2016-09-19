@@ -1,0 +1,328 @@
+---
+title: "000_ACS_analysis"
+author: "Yanjin Li"
+date: "September 15, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+# STEP 0. Package Setup and Initialization ========================================================================
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+
+# Check which user is running the script
+user <- Sys.getenv("HOME")
+
+# SET YOUR LOCAL WORKING DIRECTORY HERE 
+# pwd <- ...
+
+if (user == "/Users/yanjin.li"){
+  # Set working directory
+  setwd("/Users/yanjin1993/Google Drive/Columbia University /2016 Fall /Applied Data Science /001 Project")
+  # Set local saving directory
+  save.path <- "/export_dataframes"
+}
+```
+
+## Variable Reference 
+
+* __SENARIO__: Housing unit/GQ person serial number 
+* __PUMA__: Public use microdata area code 
+* __ST__: State code 
+* __JWMNP__: Travel time to work 
+* __JWTR__: Means of transportation to work 
+* __INDP__: Industry recode for 2013 and later based on 2012 IND codes 
+* __JWAP__: Time of arrival at work - hour and minute 
+* __PINCP__: Total person's income (signed)
+* __OCCP__: Occupation 
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
+# STEP 1. Data Manipulation and Processing =====================================================================
+# Load data 
+load("exported_dataframes/dat.pus",verbose = FALSE)
+
+ST.code.list <- list("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", 
+                  "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", 
+                  "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH",
+                  "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA",
+                  "OK", "MS", "MI", "MN", "WV", "WI", "WY", "PR")
+
+
+# Map Preparation: give state boundaries a white border
+l <- list(color = toRGB("gray"), width = 2)
+# Map Preparation: specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('gray'),
+  backgroundcolor = toRGB('gray')
+)
+
+# HELPER FUNCTION 001: Get Data by Filters (OCCP, INDP)
+GetInfobyST <- function(filter) {
+  returnlist <- list()
+  
+  # Get sum data by locations 
+  dat.sum <- dat.pus %>%
+  select(ST, ST.code, OCCP, occupation.description, INDP, industry.description) %>%
+  group_by(ST.code) %>%
+  summarise(sum = n()) %>%
+  arrange(ST.code)
+  
+  returnlist[["dat.sum"]] <- dat.sum
+  
+  if (filter == "OCCP") {
+    # Field of interests by Locations 
+    st.dat <- dat.pus %>% 
+      select(ST, ST.code, OCCP, occupation.description, INDP, industry.description) %>% 
+      group_by(ST.code, OCCP, occupation.description) %>%
+      summarise(count = n()) %>%
+      left_join(dat.sum) %>%
+      ungroup() %>% group_by(ST.code) %>%
+      arrange(desc(count)) %>%
+      mutate(pctg = count/sum, P = percent(pctg))
+  } else if (filter == "INDP") {
+    st.dat <- dat.pus %>% 
+      select(ST, ST.code, OCCP, occupation.description, INDP, industry.description) %>% 
+      group_by(ST.code, INDP, industry.description) %>%
+      summarise(count = n()) %>%
+      left_join(dat.sum) %>%
+      ungroup() %>% group_by(ST.code) %>%
+      arrange(desc(count)) %>%
+      mutate(pctg = count/sum, P = percent(pctg))
+  }
+  
+  returnlist[["st.dat"]] <- st.dat
+  
+  # Top 6 of Interests by Locations 
+  st.rank <- data.frame()
+  for (code in ST.code.list) {
+    dt <- st.dat %>% filter(ST.code == code)
+    st.rank <- rbind(st.rank, dt[1:6, ])
+  }
+  
+  if (filter == "OCCP") {
+    st.rank <- st.rank %>% ungroup() %>% filter(!is.na(occupation.description)) %>% arrange(ST.code)
+  } else if (filter == "INDP") {
+    st.rank <- st.rank %>% ungroup() %>% filter(!is.na(industry.description)) %>% arrange(ST.code)
+  }
+  returnlist[["st.rank"]] <- st.rank
+  
+  return(returnlist)
+}
+
+# HELPER FUNCTION 002: Get Data Prepared for Maps 
+GetTextbody <- function (inputdata1, inputdata2) {
+  for (i in 1:nrow(inputdata1)){
+    inputdata1$textbody[i] <- paste(inputdata1[i,c(3,7)], collapse =" ")
+  }
+  inputdata.temp <- inputdata1 %>% select(ST.code, sum, textbody) 
+  for (i in 1:51) {
+    inputdata2$text[i] <- paste(inputdata2$ST.code[i], "<br>", 
+                                paste(unlist(inputdata.temp[(1+(i-1)*6):(i*6),3]), 
+                                      collapse ="<br>"))
+  }
+  return(inputdata2)
+}
+
+```
+
+## 
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
+# STEP 2. Data Partion and Manipulation ========================================================================
+# 2.1 Occupation (OCCP) by location (ST)
+dat.occp <- GetInfobyST("OCCP")
+mapdat.occp <- GetTextbody(dat.occp$st.rank, dat.occp$dat.sum)
+
+# 2.2 Industry (INDP) by location (ST)
+dat.indp <- GetInfobyST("INDP")
+mapdat.indp <- GetTextbody(dat.indp$st.rank, dat.indp$dat.sum)
+
+# 2.3 Income (PINCP) by locations (ST)
+dat.income.st.indpdetail <- dat.pus %>% 
+  select(OCCP, occupation, occupation.description, INDP, industry, industry.description, ST.code, PINCP) %>%
+  group_by(ST.code, industry.description) %>%
+  #summarise(income.sum = sum(PINCP)) %>% ungroup() %>%
+  summarise(avg.income = mean(PINCP))
+
+# Average income by locations 
+dat.income.st <- dat.pus %>% 
+  select(ST.code, PINCP) %>% 
+  mutate(PINCP = ifelse(is.na(PINCP), 0, PINCP)) %>%
+  filter(PINCP > 0) %>%
+  group_by(ST.code) %>%
+  summarise(min.income = min(PINCP), max.income = max(PINCP), avg.income = mean(PINCP)) %>%
+  left_join(dat.pus %>% select(ST.code, PINCP) %>% 
+              group_by(ST.code) %>% summarise(pop = n())) 
+
+```
+
+
+## 3 Visualization 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# STEP 3. Data Visualizations ===================================================================================
+# 3.1 Occupation (OCCP) by location (ST) 
+
+# Choropleth Plots: Occupations by States 
+plot_ly(mapdat.occp, z = sum, text = text, locations = ST.code, type = 'choropleth',
+        locationmode = 'USA-states', color = sum, colors = "Blues",
+        marker = list(line = l), colorbar = list(title = "Millions USD"), showscale = FALSE) %>%
+  layout(title = '2014 US Occupation Overview by States (%)', 
+         geo = g) 
+
+# IL| OFF-Secretaries and Adm Assitants 1.5%| MGR-Miscellaneous Managers 1.5%| TRN-Drivers/Sales Workers 1.6%| SAL-Cashiers 1.5%|
+# OH| OFF-Secretaries and Adm Assitants 1.5%| SAL-Cashiers 1.5%| TRN-Drivers/Sales Workers 1.6%| SAL-Cashiers 1.5%|
+# MI| TRN-Drivers/Sales Workers 1.6%| SAL-Cashiers 1.5%| OFF-Secretaries and Adm Assitants 1.5%| SAL-Cashiers 1.4%|
+# NC| SAL-Cashiers 1.6%| EDU-Elementry and Middle-school Teachers 1.5%| MGR-Miscellaneous Managers 1.5%|
+# GA| EDU-Elementry and Middle-school Teachers 1.7%| MGR-Miscellaneous Managers 1.6%| SAL-Cashiers 1.4%|
+
+# 3.2 Industry (INDP) by location (ST) 
+# Choropleth Plots: Industries by States 
+plot_ly(mapdat.indp, z = sum, text = text, locations = ST.code, type = 'choropleth',
+        locationmode = 'USA-states', color = sum, colors = "Reds",
+        marker = list(line = l), colorbar = list(title = "Millions USD"), showscale = FALSE) %>%
+  layout(title = '2014 US Industry Overview by States (%)', 
+         geo = g)
+```
+
+### 3.1 Occupation Overview by US States 
+
+The following table shows the top and lowest 10 states with highest total number of people taking the survey per state, and their top three frequently mentioned occupations per state. 
+
+> #### Top 5 populated states (OCCP): 
+
+State |Top #1   |Top #2   |Top #3   |
+------|---------|---------|---------|
+CA| <span style="color:pink">MGR-Miscellaneous Managers</span> 1.7%| <span style="color:blue">SAL-Retail Salesperson </span> 1.5%| <span style="color:green">SAL-Cashiers</span> 1.3%|
+TX| <span style="color:red">EDU-Elementry and Middle-school Teachers</span> 1.9%| <span style="color:pink">MGR-Miscellaneous Managers</span> 1.6%| <span style="color:green">SAL-Cashiers</span> 1.5%|
+NY| <span style="color:red">EDU-Elementry and Middle-school Teachers</span> 1.7%| <span style="color:cyan">OFF-Secretaries and Adm Assitants </span> 1.7%| <span style="color:blue">SAL-Retail Salesperson </span> 1.5%|
+FL| <span style="color:blue">SAL-Retail Salesperson </span> 1.7%| <span style="color:pink">MGR-Miscellaneous Managers</span> 1.7%| <span style="color:red">EDU-Elementry and Middle-school Teachers</span> 1.5%|
+PA| <span style="color:cyan">OFF-Secretaries and Adm Assitants </span> 1.7%| TRN-Drivers/Sales Workers 1.6%| <span style="color:green">SAL-Cashiers</span> 1.5%|
+
+
+From the above tables, we can conclude that: Top populated states sharing majority of top frequently occupied occupations, such as _Miscellanrous Managers_, _Sales_, _Cashiers_, _Elementry and Middle-school Teachers_, _Secretaries and Assistants_, _Drivers and Related-sales_, and all occpuation's corresponding percentages are all below 2.0%, which implies
+
+(1) People in high-population states can have more occupation options, thus each occupation percentage is comparatively (to small-scale states) smaller.
+
+(2) The larger-population states do not have a specific focus during state-building process; in other words, they focus on different fields of states' improvement process instead of one or two specific industries or fields. 
+
+
+> #### Lowest 5 populated states (OCCP): 
+
+State |Top #1   |Top #2   |Top #3   |
+------|---------|---------|---------|
+WY| TRN-Drivers/Sales Workers 2.2%| EDU-Elementry and Middle-school Teachers 2%| OFF-Secretaries and Adm Assitants 2%|
+VT| EDU-Elementry and Middle-school Teachers 1.8%| MGR-Miscellaneous Managers 1.7%| SAL-Retail Salesperson 1.6%|
+DC| __MGR-Miscellaneous Managers 4.2%__| __LGL-Lawyers, Judges, Magistrates and Other Judicial Workers 3.3%__| OFF-Secretaries and Adm Assitants 1.7%| 
+AK| __CLN-Janitros and Building Cleaners 2%__| MGR-Miscellaneous Managers 1.9%| __FFF-Fishing and Hunting Workers 1.8%__|
+ND| __MGR-Farmers, and Other Agricultural Managers 4.4%__| TRN-Drivers/Sales Workers 2.3%| __FFF-Miscellaneous Agricultural Workers 1.8%__|
+
+
+From the above tables, we can conclude that: most of the low populated states have their own specific focus on states' industry/occupation fields. For example, in DC, the two of the top three occupations are both related to government and law, while in ND, top three occupations are more related to agriculture. From this fact, we can demonstrate that 
+
+
+(1) People in low-population states may have less occupation options, thus each occupation percentage is comparatively (to large-scale states) greater.
+
+(2) People in low-population states can have more focused industry and fields during state-building process.  
+
+
+### 3.2 Industry Overview by US States 
+
+The following table shows the top and lowest 5 states with highest total number of people taking the survey per state, and their top three frequently mentioned industry per state. 
+
+> #### Top 5 populated states (INDP): 
+
+State |Top #1   |Top #2   |Top #3   |
+------|---------|---------|---------|
+CA| <span style="color:pink">ENT-Resturants</span> 3.3%| <span style="color:blue">EDU-Elementry and Secondary Schools</span> 3.3%| <span style="color:green">CON-Construction and Incl Cleaning </span> 3.2%|
+TX| <span style="color:blue">EDU-Elementry and Secondary Schools</span> 4.3%| <span style="color:green">CON-Construction and Incl Cleaning </span> 4.1%| <span style="color:pink">ENT-Resturants</span> 3.5%|
+NY| <span style="color:blue">EDU-Elementry and Secondary Schools</span> 4.5%| <span style="color:pink">ENT-Resturants</span> 3.2%| <span style="color:green">CON-Construction and Incl Cleaning </span> 3.2%|
+FL| <span style="color:pink">ENT-Resturants</span> 3.5%| <span style="color:green">CON-Construction and Incl Cleaning </span> 3.5%| <span style="color:blue">EDU-Elementry and Secondary Schools</span> 3.3%| 
+PA| <span style="color:green">CON-Construction and Incl Cleaning </span> 3.8%| <span style="color:blue">EDU-Elementry and Secondary Schools</span> 3.5%| <span style="color:pink">ENT-Resturants</span> 3.5%|
+
+
+From the above tables, we can conclude that: Top populated states sharing all of top frequently occupied industry, _Food Services_, _Elementry and Secondary Schools_, _Construction and Incl Cleaning_. 
+
+
+
+> #### Lowest 5 populated states (OCCP): 
+
+State |Top #1   |Top #2   |Top #3   |
+------|---------|---------|---------|
+WY| EDU-Elementry and Secondary Schools 5.2%| CON-Construction and Incl Cleaning 4.8%| ENT-Resturants 3.5%|
+VT| CON-Construction and Incl Cleaning 5.3%| EDU-Elementry and Secondary Schools 4.9%| __MED-Hospitals__ 3.7%|
+DC| ENT-Resturants 3.7%| __EDU-Colleges, Universities, Professional Schools__ 3.7%| __PRF-Management, Scientific and Tech Consulting__ 3.3%|
+AK| EDU-Elementry and Secondary Schools 5.5%| CON-Construction and Incl Cleaning 5.0%| __ADM-Executive Offices and Legislative Bodies__ 3.4%|
+ND| __AGR-Crop Production__ 5%| CON-Construction and Incl Cleaning 4.2%| EDU-Elementry and Secondary Schools 4.2%|
+
+From the above tables, we can conclude that: most of the low populated states have their own specific focus on states' industry. For example, in DC, the goverment/city development department is focusing on high-level education, while in ND, the government is more focusing on agricultural prodution. 
+
+(1) People in low-population states can have more focused industry and fields during state-building process.  
+
+
+
+
+### 3.3 Income Overview by Locations 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# 3.3 Average Income by Locations
+plot_ly(dat.pus %>% select(ST.code, PINCP) %>%
+  mutate(PINCP = ifelse(is.na(PINCP), 0, PINCP)) %>%
+  filter(PINCP > 0), x = ST.code, y = PINCP, color = ST.code, type = "box",
+  showlegend = FALSE)
+
+plot_ly(dat.income.st, x = ST.code, y = avg.income, 
+  name = "Average income by Location") 
+
+```
+
+From the above plots, we can tell that (regardless of occupation or industry)
+* The highest average income is in DC
+* The lowest average income is in MS
+* The top spreading-out incomes are in CT, NY, NJ, TX, CA 
+* The less spreading-out incomes are in MT, IA, KY, WY
+
+
+### 3.4 Income Overview by Locations and Industry 
+
+State |Industry|Average Income|
+------|---------|---------|
+CT|EXT-METAL ORE MINING|$643200.0|
+MD|MFG-KNITTING FABRIC MILLS, AND APPAREL KNITTING MILLS|$467000.0|
+WA|MFG-LEATHER TANNING AND FINISHING AND OTHER ALLIED PRODUCTS MANUFACTURING|$456100.0|
+ND|FIN-VIDEO TAPE AND DISK RENTAL|$426000.0|
+ME|MFG-RUBBER PRODUCTS, EXCEPT TIRES|$398500.0|
+RI|EXT-OIL AND GAS EXTRACTION|$384000.0|
+DC|MFG-MOTOR VEHICLES AND MOTOR VEHICLE EQUIPMENT|$355300.0|
+VT|WHL-PAPER AND PAPER PRODUCTS MERCHANT WHOLESALERS|$333000.0|
+VT|MFG-FABRIC MILLS, EXCEPT KNITTING MILLS|$330000.0|
+CT|MFG-LEATHER TANNING AND FINISHING AND OTHER ALLIED PRODUCTS MANUFACTURING|$329800.0|
+
+
+
+## 4 Job Recommendations based on Location Information 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# STEP 4. Job Recommendations ===================================================================================
+
+
+
+```
+
+
+* People who do not have specific focus on their career paths should consider living and working in some high-population states, such as CA, TX, NY, etc. 
+* People with specific interests in some industries and focus in their career path, they should consider living and working in some low-population states with specific industry environment, such as lawyers in DC and farmers in ND, etc. 
+* 
+
+
+
+
+
+
