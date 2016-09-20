@@ -509,7 +509,7 @@ workinghour$PINCP<-workinghour$PINCP/1000
 
 ### 5.1 (Ungrouped) Working Hours by Occupations 
 
-So the occupation with longest average working hour is Derrick and Mining Machine worker, followed by Military and Lawyer.
+The occupation with longest average working hour is Derrick and Mining Machine worker, followed by Military and Lawyer.
 
 On the country, people working in restaurant works least such as cooks or food servers or dishwashers.  Then comes people from other service industry, such as Fitness workers, Tour guides, Barbers, etc.
 
@@ -519,18 +519,19 @@ avgworkinghour<-workinghour%>%group_by(occupation)%>%summarise(avgwkhp=mean(WKHP
 workinghour$occupation<-factor(workinghour$occupation,levels=avgworkinghour$occupation)
 workinghour<-workinghour%>%arrange(occupation)
 box_plot_occupation <- plot_ly(workinghour, x = WKHP, color = occupation, type = "box")
-box_plot_occupation
+box_plot_occupation %>% layout(showlegend = FALSE)
 ```
 
 
 ### 5.2 (Ungrouped) Working Hours, Occupation, vs Income 
 
-We can see after working hours exceed 60 hours, the income starts to decrease while working hour keep increasing.
+This is an overview of working hours, occupaion and income, we can see incomes diverse a lot with long working hours while diverse only a little bit with short working hours.
+
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #####An overview of working hour, occupation and income
-avgincome<-workinghour%>%group_by(WKHP,occupation)%>%summarise(avgincome=mean(PINCP))
-line_plot_nogroup<-ggplot(data=avgincome, aes(x=WKHP, y=avgincome, group = occupation, colour = occupation)) +
+medincome<-workinghour%>%group_by(WKHP,occupation)%>%summarise(medincome=median(PINCP))
+line_plot_nogroup<-ggplot(data=medincome, aes(x=WKHP, y=medincome, group = occupation, colour = occupation)) +
   geom_line(size=1)+
   ylab("Income (in thousand)")+
   xlab("")+
@@ -552,22 +553,14 @@ line_plot_nogroup<-ggplot(data=avgincome, aes(x=WKHP, y=avgincome, group = occup
 
 line_plot_nogroup
 
-lingplotweb_nogroup<-plot_ly(avgincome, x = WKHP, y = avgincome, color = occupation)
-lingplotweb_nogroup
+#lingplotweb_nogroup<-plot_ly(avgincome, x = WKHP, y = avgincome, color = occupation)
+#lingplotweb_nogroup
 
 ```
 
 ### 5.3 Grouped Working Hours 
 
-So the income is increasing with the working hours when you do not work so much, but as the working hours exceed 60 hours per week, the trend becomes unclear. 
-
-Also the trend of different occupation differs a lot. For example, for LGL-LAWYERS, AND JUDGES, MAGISTRATES, AND OTHER, it is increasing all the time, while for people work in medical area such as PHYSICIANS AND SURGEONS, the income is going down as working hours going up, this phenomenon also appears on many other occupations.
-
-If you prefer regular working hour as 8 hours per day or 40 per week, then the top 5 choices of career are Lawyer, Computer programmer or developer, Engineer, Physician and Scientist.
-
-If you are fine with long working hours, you can try to be a Lawyer or Derrick and Mining Machine worker.
-
-Also, It seems that the higher-income jobs do not need you to work overtime while you need to work overtime with low-income job to earn higher income.
+This is a careful analysis by deviding working hours into 10 groups. So the income is increasing with the working hours when you do not work so much, but as the working hours exceed 60 hours per week, the trend becomes unclear. 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 ########Careful analysis by deviding working hour into 10 groups
@@ -588,34 +581,50 @@ workinghourgroup$workhour<-factor(workinghourgroup$workhour,levels=unique(workin
 box_plot_income <- plot_ly(workinghourgroup, x = PINCP, color = workhour, type = "box")
 box_plot_income
 
-# averageincome<-workinghourgroup%>%group_by(workhour,occupation)%>%summarise(avgincome=mean(PINCP))
-# line_plot_group<-ggplot(data=averageincome, aes(x=workhour, y=avgincome, group = occupation, colour = occupation)) +
-#   geom_line(size=1)+
-#   ylab("Income(in thousand)")+
-#   xlab("")+
-#   geom_point( size=1.2)+
-#   theme_bw() +
-#   theme(
-#     plot.background = element_blank()
-#     ,panel.grid.major = element_blank()
-#     ,panel.grid.minor = element_blank()
-#     ,panel.border = element_blank()
-#     ,axis.text=element_text(size=8)
-#     ,axis.ticks=element_blank()
-#     ,legend.position="none"
-#     ,legend.title = element_blank()
-#   )+
-#   guides(colour=guide_legend(ncol=1))+
-#   ggtitle("Working hours vs Income")+
-#   scale_colour_discrete(guide = 'none') +
-#   scale_x_discrete(expand=c(0, 1)) +
-#   geom_dl(aes(label = occupation), method = list(dl.combine("first.points","last.points"), cex = 0.8))
+```
+
+The trend of different occupation differs a lot. For example, for LGL-LAWYERS, AND JUDGES, MAGISTRATES, AND OTHER, it is increasing all the time, while for people work in medical area such as PHYSICIANS AND SURGEONS and for scientist, the income is going down as working hours going up, this phenomenon also appears on many other occupations.
+
+If you prefer regular working hour as 8 hours per day or 40 per week, then the top 5 choices of positions are computer programmers or developers, Engineers,lawyers, scientists and physicians.
+
+If you are fine with long working hours, you can try to be a lawyer, engineer, computer programmer or Derrick and Mining Machine worker.
+
+It seems that for some physical work, people need to work for long hours to earn more money such as Derrick people or construction labor. The longer hours they work, the more they earn.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+ medianincome<-workinghourgroup%>%group_by(workhour,occupation)%>%summarise(medincome=median(PINCP))
+ # line_plot_group<-ggplot(data=averageincome, aes(x=workhour, y=avgincome, group = occupation, colour = occupation)) +
+ #   geom_line(size=1)+
+ #   ylab("Income(in thousand)")+
+ #   xlab("")+
+ #   geom_point( size=1.2)+
+ #   theme_bw() +
+ #   theme(
+ #     plot.background = element_blank()
+ #     ,panel.grid.major = element_blank()
+ #     ,panel.grid.minor = element_blank()
+ #     ,panel.border = element_blank()
+ #     ,axis.text=element_text(size=8)
+ #     ,axis.ticks=element_blank()
+ #     ,legend.position="none"
+ #     ,legend.title = element_blank()
+ #   )+
+ #   guides(colour=guide_legend(ncol=1))+
+ #   ggtitle("Working hours vs Income")+
+ #   scale_colour_discrete(guide = 'none') +
+ #   scale_x_discrete(expand=c(0, 1)) +
+ #   geom_dl(aes(label = occupation), method = list(dl.combine("first.points","last.points"), cex = 0.8))
+ # 
+ # line_plot_group
 # 
-# line_plot_group
-# 
-# lineplotweb_group<-plot_ly(averageincome, x = workhour, y = avgincome, color = occupation)
+ lineplotweb_group<-plot_ly(medianincome, x = workhour, y = medincome, color = occupation)
+ 
+ lineplotweb_group
 
 ```
+
+
 
 
 ## 6. Conclusion 
