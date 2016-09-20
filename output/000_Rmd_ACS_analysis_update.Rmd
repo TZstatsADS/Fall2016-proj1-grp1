@@ -120,11 +120,11 @@ colnames(data_OCCP1)[2]<-"ArrivalTime"
 colnames(data_OCCP1)[3]<-"CumulativeProportion"
 g<-ggplot(data=data_OCCP1,aes(x=Occupation,y=CumulativeProportion,fill=ArrivalTime))
 g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. Occupation")+scale_fill_manual(values=c(
-"red","green","yellow","brown","orange","grey",'blue')) 
-#ggplotly()
+"red","green","yellow","brown","orange","grey","blue")) 
+ggplotly()
 ```
 
-From this plot, we can see arrival time is different due to the variety of occupations. Most occupations require an arrival time between 4am and 12pm. Outliers include occupations in the EAT sector, like chefs or waiters, who begin their shifts after noon.
+From this plot, we can see arrival time is different due to the variety of occupations. Most occupations require an arrival time between 8am and 12pm. Outliers include occupations in the EAT sector, like chefs or waiters, who begin their shifts after noon.
 
 
 ### 2.2 Arrival Time vs. States
@@ -143,11 +143,11 @@ colnames(data_JWAP1)[2]<-"ArrivalTime"
 colnames(data_JWAP1)[3]<-"CumulativeProportion"
 g<-ggplot(data=data_JWAP1,aes(x=State,y=CumulativeProportion,fill=ArrivalTime))
 g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. State")+scale_fill_manual(values=c(
-"red","green","yellow","brown","orange","grey",'blue')) 
-#ggplotly()
+"red","green","yellow","brown","orange","grey","blue")) 
+ggplotly()
 ```
 
-We can see clearly from the plot that most people in most states arrive at work between 4 and 8am, but In DC, unexpectedly, most of people arrive between 8am and 12pm. Basically, if you want to sleep more and get to work later in the day, you can choose DC as your ideal place to work.
+We can see clearly from the plot that most of people arrive at work from 6am to 10am, no matter which state they are working in. More specifically, in most of the states, people arrive at work between 6am and 8am, but In DC, unexpectedly, large amounts of people arrive at 8-10am. Basically, if you want to sleep more and get to work later in the day, you can choose DC as your ideal place to work.
 
 ### 2.3 Arrival Time vs. States/Occupation in Bubble Plots 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -175,7 +175,7 @@ layout(title="Median Income v.s. Median Arrival Time")
 ```
 
 
-This Figure is another piece of evidence that DC is an ideal place for work, since it shows that the people who work in DC have the latest arrival time and highest income. We suggest DC as a great place to find jobs.
+This Figure is another piece of evidence that DC is an ideal place for work, since it shows that the people who work in DC have the latest arrival time and highest income. Moreover, there is an obvious distinction between DC and other states. This is an interesting point and we will talk about it in the following parts.
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -197,6 +197,11 @@ layout(title="Median Income v.s. Median Arrival Time")
 ```
 
 As we have mentioned, although the EAT sector has latest arrival time; however it also has a low salary level. Meanwhile, people who work in the LGL sector, like lawyers or judges, earn more but work earlier than others. So we need to make a choice, high salary or get up later?
+
+
+### 2.4 Comments of Part 2
+
+Most of states have their arrival time at regular interval, but DC is different from others. If we consider both arrival time and income factors, DC is also a good choice. So it is suggested to consider DC as the first level in the job selection. For occupational suggestion, LGL sector, such as lawyers and judges, may be some ideal occupations, based on their highest income and top 5 latest arrival time. 
 
 
 
