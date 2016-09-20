@@ -124,7 +124,7 @@ g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. Occupatio
 ggplotly()
 ```
 
-From this plot, we can see arrival time is different due to many choice of occupations. Most of occupations have arrival time focus on 4-12. Think about the occupation EAT, like chefs or waiters, they have their work time beginning after noon. And it not to understand for that fact.
+From this plot, we can see arrival time is totally different due to many choices of occupations. Most of occupations have arrival time focus on 6-12, for example LGL, SCI, etc. But thinking about the occupation EAT, like chefs or waiters, they always have their work time beginning after 12. 
 
 
 ### 2.2 Arrival Time vs. States
@@ -147,7 +147,7 @@ g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. State")+s
 ggplotly()
 ```
 
-We can see clearly from the plot that most of people in most of the state arrive at work at 4-8, but In DC, unexpectedly, most of people arrive at 8-12. So basically, if you want to sleep more and get to work late, you can choose DC as your ideal place to work.
+We can see clearly from the plot that most of people arrive at work from 6 to 10, no matter which state they are working in. More specifically, in most of the states, people arrive at work between 6 to 8, but In DC, unexpectedly, large amounts of people arrive at 8-10. So basically, if you want to sleep more and get to work a little late, you may choose DC as your ideal place.
 
 ### 2.3 Arrival Time vs. States/Occupation in Bubble Plots 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -174,7 +174,7 @@ plot_ly(data_c1,x=MedianArrivalTime,y=MedianIncome,text=paste("State: ", ST),
 layout(title="Median Income v.s. Median Arrival Time")
 ```
 
-And this Fig is another proof that DC is a good place for work, since it shows that the people work in DC have latest arriving time and highest income. So in my opinion, I suggest DC as a great state to find jobs
+And this Fig is another proof that DC is a good place for work, since it shows that the people working in DC have latest median arrival time and highest median income. Moreover, there is an obvious distinction between DC and other states. This is an interesting point and we will talk about it in the following parts.
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -195,11 +195,15 @@ layout(title="Median Income v.s. Median Arrival Time")
 #End of code#
 ```
 
-As we have mentioned, although EAT has latest arriving time, it also at a low level for salary. Meanwhile, people work as LGL, like lawyers or judges, they earn more but work earlier than others. So we need to make a choice, high salary or get up late?
+As we have mentioned, EAT has latest arriving time in general, but it is also at a low level for salary. Meanwhile, people work as LGL, like lawyers or judges, they earn more but work earlier comparing to EAT. So for arriving-time opinion, there is no so-called “perfect” occupation. We have to make a choice, high salary or get up late?
+
+### 2.4 Comments of Part 2
+
+Most of states have their arrival time at regular interval, but DC is different from others and it is suggested at the first level in the job selection based on arrival time. If we consider both arrival time and income factors, DC is also a good choice. For occupational suggestion, LGL, such as lawyers and judges, may be some ideal occupations, based on highest income and top 5 latest arrival time. 
 
 
 
-## 4. Location vs. Occupation
+## 3. Location vs. Occupation
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
 # YANJIN LI (Locations) ===========================================================================================
