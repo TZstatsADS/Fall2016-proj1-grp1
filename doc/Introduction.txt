@@ -1,0 +1,15 @@
+Our project focused on job recommendation according to four interesting factors, arrival time for work, location, working hours and the way they get to job. 
+We investigated their effects on income respectively and help you make job-decision.
+
+First, our group explored the the relation of arrival time for work and income. We compared different occupations' arrival time for work and used
+bubble plot to show the relation of occupation, arrival time and income.
+
+Then we looked into the population of different occupation and their income in each states, picking up the top 5 and lowest 5.  
+
+In the third part, the heatmap implied that people's transportion preferences may reflect their income situations. And the treemap
+help to figure out traveling in which way and which job is most profitable.
+
+Finally, we seeked the interconnection of working hours, occupations and salaries.
+
+
+
