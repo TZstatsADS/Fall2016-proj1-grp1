@@ -389,7 +389,7 @@ From the above plots, we can tell that (regardless of occupation or industry)
 * 3rd-teir Average Income States: TX, ND, IL and lower-tiers states are mostly from inland US. 
 
 
-### 3.3 Overage Income Performance Overview by Occupations
+### 3.3 Average Income Performance Overview by Occupations
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # 3.3 Average Income by Occupations
 plot_ly(dat.income.occp, x = occupation, y = avg.income, 
@@ -444,7 +444,7 @@ colnames(dt3) <- jwtr.description[,2] ##replace JWTR code with JWTR actual descr
 d3heatmap(dt3[-18,],scale="column",colors="RdYlBu",height=800,width=500,na.rm = TRUE) ##draw the D3 heatmap with color scheme RdYlBu and also set the height and width of the heatmap
 ```
 
-From the above heatmap above, we can easily find the preferred occupation for each means of transportation to work. On the heatmap, the deeper the blue color is , the higher he income it indicates. Conversely, the deeper the orange color on the grid, the lower income it indicates. For example, for Taxicab, the deepest blue grid is LGL, so the LGL is the best occupation for people who use Taxicab to work.  Another way to utilize this plot is to have an income reference about a specific combination of means of transportation and occupation. For instance, if you want to work in the sector of SCI and want to commute by Ferryboat, then you are expected to have an annual income of $60,500 .
+From the above heatmap above, we can easily find the preferred occupation for each means of transportation to work. On the heatmap, the deeper the blue color is , the higher he income it indicates. Conversely, the deeper the orange color on the grid, the lower income it indicates. For example, for Taxicab, the deepest blue grid is FIN, so the FIN sector is the best occupation for people who use Taxicab to work.  Another way to utilize this plot is to have an income reference about a specific combination of means of transportation and occupation. For instance, if you want to work in the sector of SCI and want to commute by Ferryboat, then you are expected to have an annual income of $60,500 .
 
 
 ### 4.2  Treemap
