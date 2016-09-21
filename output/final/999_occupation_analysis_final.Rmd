@@ -595,7 +595,7 @@ It seems that for some physical work, people need to work for long hours to earn
 
 ## 6. Conclusion 
 
-If you hate get up early in morning, you could refer to the Arrival Time vs. Occupation part. If you are free to move to other states to get a higher paid job, you could look at tables in the Location vs. Occupation part. And if you are instereting in transportion preferences, the Transportation vs. Occupation part may help you find a job with short commuting time. The last part, Working Hours vs. Occupation, indicates most occuptations don't provide you most salary for longest working hour. So try to finish your work efficiently.
+If you hate get up early in morning, you could refer to the Arrival Time vs. Occupation part. If you are free to move to other states to get a higher paid job, you could look at tables in the Location vs. Occupation part. And if you are insterested in transportation preferences, the Transportation vs. Occupation part may help you find a job with short commuting time. The last part, Working Hours vs. Occupation, indicates most occupations don't provide you most salary for longest working hour. So try to finish your work efficiently.
 
 ## 7. Team Member and Responsibilities:
 
