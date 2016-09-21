@@ -108,7 +108,7 @@ colnames(data_OCCP1)[2]<-"ArrivalTime"
 colnames(data_OCCP1)[3]<-"CumulativeProportion"
 g<-ggplot(data=data_OCCP1,aes(x=Occupation,y=CumulativeProportion,fill=ArrivalTime))
 ggplotly(g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. Occupation")+scale_fill_manual(values=c(
-"red","green","yellow","brown","orange","grey","blue")))
+"red","green","yellow","brown","orange","grey","blue"))+theme(axis.text=element_text(size=8)),width=800,height=600)
 ```
 
 From this plot, we can see arrival time is different due to the variety of occupations. Most occupations require an arrival time between 8am and 12pm. Outliers include occupations in the EAT sector, like chefs or waiters, who begin their shifts after noon.
@@ -130,7 +130,7 @@ colnames(data_JWAP1)[2]<-"ArrivalTime"
 colnames(data_JWAP1)[3]<-"CumulativeProportion"
 g<-ggplot(data=data_JWAP1,aes(x=State,y=CumulativeProportion,fill=ArrivalTime))
 ggplotly(g+geom_bar(position="fill",stat="identity")+ggtitle("Arrival Time v.s. State")+scale_fill_manual(values=c(
-"red","green","yellow","brown","orange","grey","blue")))
+"red","green","yellow","brown","orange","grey","blue"))+theme(axis.text=element_text(size=6)),width=1000,height=600)
 ```
 
 We can see clearly from the plot that most of people arrive at work from 6am to 10am, no matter which state they are working in. More specifically, in most of the states, people arrive at work between 6am and 8am, but In DC, unexpectedly, large amounts of people arrive at 8-10am. Basically, if you want to sleep more and get to work later in the day, you can choose DC as your ideal place to work.
