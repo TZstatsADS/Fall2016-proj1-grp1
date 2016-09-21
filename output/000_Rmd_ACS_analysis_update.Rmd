@@ -199,13 +199,13 @@ layout(title="Median Income v.s. Median Arrival Time")
 As we have mentioned, although the EAT sector has latest arrival time; however it also has a low salary level. Meanwhile, people who work in the LGL sector, like lawyers or judges, earn more but work earlier than others. So we need to make a choice, high salary or get up later?
 
 
-### 2.4 Comments of Part 2
+### 2.4 Comments
 
 Most of states have their arrival time at regular interval, but DC is different from others. If we consider both arrival time and income factors, DC is also a good choice. So it is suggested to consider DC as the first level in the job selection. For occupational suggestion, LGL sector, such as lawyers and judges, may be some ideal occupations, based on their highest income and top 5 latest arrival time. 
 
 
 
-## 4. Location vs. Occupation
+## 3. Location vs. Occupation
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
 # YANJIN LI (Locations) ===========================================================================================
@@ -403,7 +403,7 @@ From the above plots, we can tell that (regardless of occupation or industry)
 * 3rd-teir Average Income States: TX, ND, IL and lower-tiers states are mostly from inland US. 
 
 
-### 3.4 Overage Income Performance Overview by Occupations
+### 3.3 Overage Income Performance Overview by Occupations
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # 3.3 Average Income by Occupations
 plot_ly(dat.income.occp, x = occupation, y = avg.income, 
@@ -414,7 +414,7 @@ plot_ly(dat.income.occp, x = occupation, y = avg.income,
 From the above plots, we can tell that law-related, engineering-related, finance-related, and business-related occupations earn the highest income.
 
 
-### 3.5 Job Recommendation based on Locations
+### 3.4 Job Recommendation based on Locations
 
 * People who do not have a specific focus on their career paths should consider living and working in some high-population states, such as CA, TX, NY, etc. 
 * People with specific interests in some industries and focus in their career path, they should consider living and working in some low-population states with an industry-specific environment, such as lawyers in DC and farmers in ND, etc. 
@@ -634,6 +634,7 @@ It seems that for some physical work, people need to work for long hours to earn
 
 ## 6. Conclusion 
 
+If you hate get up early in morning, you could refer to the Arrival Time vs. Occupation part. If you are free to move to other states to get a higher paid job, you could look at tables in the Location vs. Occupation part. And if you are instereting in transportion preferences, the Transportation vs. Occupation part may help you find a job with short commuting time. The last part, Working Hours vs. Occupation, indicates most occuptations don't provide you most salary for longest working hour. So try to finish your work efficiently.
 
 ## 7. Team Member and Responsibilities:
 
