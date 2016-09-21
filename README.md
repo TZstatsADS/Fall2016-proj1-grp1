@@ -3,15 +3,23 @@
 
 Term: Fall 2016
 
-+ Team #
-+ Projec title: Lorem ipsum dolor sit amet
++ Team # 1
++ Projec title: Occupation Recommendation Analysis
 + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
-+ Project summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+	+ Yanxi Chen
+	+ Yanjin Li
+	+ Chang Liu
+	+ Mengyuan Tao
+	+ Qin Yu
++ Project summary: Our project focused on job recommendation according to four interesting chosen factors, including arrival time for work, location, working hours and commuting means. We investigated their effects on income respectively and helped make a job-decision for your reference. Thus, our team has dug into the relations between following factors:
+
+Part 2. Arrival Time vs. Occupation: We compared different occupations' arrival time for work and used bubble plots to show different occupations' median arrival time and median income together.
+
+Part 3. Location vs. Occupation: We explored the difference in income and employees' number of different occupations in each states.
+
+Part 4. Transportation vs. Occupation: We showed that people who do certain jobs and commute to work in a certain way earn more.
+
+Part 5. Working Hours vs. Occupation: We analyzed how working hour affected different occupations' salaries.
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
