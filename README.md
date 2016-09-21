@@ -4,7 +4,7 @@
 Term: Fall 2016
 
 + Team # 1
-+ Projec title: Occupation Recommendation Analysis
++ Projec title: The Ultimate Job Matching
 + Team members
 	+ Yanxi Chen
 	+ Yanjin Li
